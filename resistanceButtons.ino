@@ -106,7 +106,8 @@ int detectAction(int analogReadValue)
         int currentPressedButton = pressedButton;
         while (millis() - pressTimeEnd < DOUBLE_CLICK_INTERVAL)
         {
-            currentPressedButton = readPressedButton(A0);
+            currentPressedButton = readPressedButton(analogRead(A0));
+            printLog("currentButton", currentPressedButton);
             if (currentPressedButton == pressedButton)
             {
                 action = BUTTONS[pressedButton][2];
