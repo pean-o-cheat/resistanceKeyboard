@@ -7,14 +7,15 @@
 #define LONG_PRESS_TIME 1000
 #define DOUBLE_CLICK_INTERVAL 300
 #define READ_DELAY 20
+#define VERBOSE true
 
-const int BUTTONS[6][4] = {
+const int BUTTONS[5][4] = {
   //{analogValue, single click function, double click function, long click function}
     {872, 2, 12, 20}, // CH+
     {825, 3, 13, 17}, // CH-
     {767, 7, 18, 10}, // VOL+
     {697, 6, 16, 10}, // VOL-
-    {980, 4, 11}  // MODE
+    {980, 4, 11, 4}  // MODE
 };
 const int FUNCTIONS[21][2] = {
     {218},      // 0  arrow up
@@ -46,6 +47,17 @@ int analogReadValue = 0;
 int pressDuration = 0;
 
 // functions
+
+void printLog(char* message, int parameter)
+{
+    if (VERBOSE)
+    {
+        Serial.print(String(message));
+        Serial.print(": ");
+        Serial.println(parameter);
+    }
+}
+
 int readPressedButton(int analogValue)
 {
     int button = -1;
@@ -64,14 +76,15 @@ int pressTime(int pressedButton)
 {
     int pressedTimeStart = millis();
     int currentPressedButton = pressedButton;
-    do
+    int analogReadValue = 0;
+    while (currentPressedButton == pressedButton)
     {
+        delay(READ_DELAY);
+        analogReadValue = analogRead(A0);
         currentPressedButton = readPressedButton(analogReadValue);
     }
-    while ((currentPressedButton != -1 && currentPressedButton == pressedButton) && millis() - pressedTimeStart < LONG_PRESS_TIME);
     int pressedTime = millis() - pressedTimeStart;
-    Serial.print("Wcisnieto przycisk: ");
-    Serial.println(pressedButton);
+    printLog("Wcisnieto przycisk", pressedButton);
     return pressedTime; // return pressed time
 }
 
@@ -80,31 +93,29 @@ int detectAction(int analogReadValue)
     int pressedButton = readPressedButton(analogReadValue);
     int action = -1;
     int pressTimeValue = pressTime(pressedButton);
-    Serial.print("Czas wcisniecia: ");
-    Serial.println(pressTimeValue);
+    printLog("Czas wcisniecia", pressTimeValue);
     int pressTimeEnd = millis();
+    if (pressedButton == -1) {return -1;}
     if (pressTimeValue >= LONG_PRESS_TIME)
     {
         action = BUTTONS[pressedButton][3];
-        Serial.print("Long press: ");
-        Serial.println(action);
+        printLog("Long press", action);
         return action;
     } else
     {
+        int currentPressedButton = pressedButton;
         while (millis() - pressTimeEnd < DOUBLE_CLICK_INTERVAL)
         {
-            Serial.println("PRUBUJEMY");
-            if (readPressedButton(analogRead(A0)) == pressedButton)
+            currentPressedButton = readPressedButton(A0);
+            if (currentPressedButton == pressedButton)
             {
                 action = BUTTONS[pressedButton][2];
-                Serial.print("Double click: ");
-                Serial.println(action);
+                printLog("Double click", action);
                 return action;
             }
         }
         action = BUTTONS[pressedButton][1];
-        Serial.print("Single click: ");
-        Serial.println(action);
+        printLog("Single click", action);
         return action;
     }
     return action;
@@ -115,7 +126,6 @@ void setup()
 {
     Serial.begin(9600);
     Keyboard.begin();
-    Serial.println("Initialization...");
 }
 
 void loop()
@@ -125,8 +135,7 @@ void loop()
         delay(READ_DELAY);
         analogReadValue = analogRead(A0);
         int action = detectAction(analogReadValue);
-        Serial.print("Action: ");
-        Serial.println(action);
+        printLog("Action", action);
         if (action >= 0)
         {
             Keyboard.press(FUNCTIONS[action][0]);
