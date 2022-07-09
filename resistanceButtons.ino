@@ -7,7 +7,7 @@
 #define LONG_PRESS_TIME 800
 #define DOUBLE_CLICK_INTERVAL 80
 #define READ_DELAY 20
-#define VERBOSE true
+#define VERBOSE false
 
 const int BUTTONS[5][4] = {
     //{analogValue, single click function, double click function, long click function}
@@ -43,7 +43,6 @@ const int FUNCTIONS[21][2] = {
 
 // variables
 int analogReadValue = 0;
-// int pressedButton = -1;
 int pressDuration = 0;
 
 // functions
@@ -84,7 +83,7 @@ unsigned long pressTime(int pressedButton)
         currentPressedButton = readPressedButton(analogReadValue);
     }
     unsigned long pressedTime = millis() - pressedTimeStart;
-    printLog("Wcisnieto przycisk", pressedButton);
+    printLog("Pressed button", pressedButton);
     return pressedTime; // return pressed time
 }
 
@@ -95,7 +94,7 @@ int detectAction(int analogReadValue)
     int action = -1;
     int pressTimeValue = pressTime(pressedButton);
     bool doubleClicked = false;
-    printLog("Czas wcisniecia", pressTimeValue);
+    printLog("pressTimeValue", pressTimeValue);
     unsigned long pressTimeEnd = millis();
     if (pressedButton == -1)
     {
