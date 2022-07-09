@@ -1,0 +1,6 @@
+{
+    "sketch": "resistanceButtons.ino",
+    "board": "arduino:avr:leonardo",
+    "port": "COM9",
+    "programmer": "arduino:avrisp"
+}
