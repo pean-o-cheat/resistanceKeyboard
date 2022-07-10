@@ -136,7 +136,10 @@ int detectAction(int analogReadValue)
 // main
 void setup()
 {
-    Serial.begin(9600);
+    if (VERBOSE)
+    {
+        Serial.begin(9600);
+    }
     Keyboard.begin();
 }
 
