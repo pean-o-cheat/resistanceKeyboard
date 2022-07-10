@@ -1,5 +1,6 @@
 // OPENAUTO PRO resistive buttons
 // You need Arduino Leonardo or Micro to use this code
+// Default values are for Honda Civic with Connects2 controller using a resistor of 50k
 #include <Keyboard.h>
 
 // *CONFIGURATION*
